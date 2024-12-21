@@ -1,0 +1,161 @@
+{% extends 'product/base.html' %}
+{% load static %}
+{% block content %}
+    <!-- Hero Section Begin -->
+    <section class="hero hero-normal">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="hero__categories">
+                        <div class="hero__categories__all">
+                            <i class="fa fa-bars"></i>
+                            <span>All categories</span>
+                        </div>
+                        <ul>
+                            {% for category in categories %}
+                            <li><a href="{% url 'product:listproductbycate' %}?id={{category.id}}">{{category.name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="hero__search">
+                        <div class="hero__search__form">
+                            <form action="{% url 'product:listproductbysearch' %}" method="get">
+                                <input name="keyword" type="text" placeholder="What do you need?" required="required">
+                                <button type="submit" class="site-btn">SEARCH</button>
+                            </form>
+                        </div>
+                        <div class="hero__search__phone">
+                            <div class="hero__search__phone__icon">
+                                <i class="fa fa-phone"></i>
+                            </div>
+                            <div class="hero__search__phone__text">
+                               <h5>098666888</h5>
+                                <span>Hỗ trợ  24/7 </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Hero Section End -->
+
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{% static 'img/breadcrumb.jpg'%}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb__text">
+                        <h2>Organi Shop</h2>
+                        <div class="breadcrumb__option">
+                            <a href="./index.html">Home</a>
+                            <span>Shop</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Product Section Begin -->
+    <section class="product spad">
+    <div class="center">
+        <h3><strong>{{Category.name }}</strong></h3>
+    </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-5">
+                   <div class="sidebar__item">
+                            <div class="latest-product__text">
+                                <h4>Sản phẩm mới</h4>
+                                <div class="latest-product__slider owl-carousel">
+                                    <div class="latest-prdouct__slider__item">
+                                        {% for product in listProduct %}
+                                            {% if product.isNew == True %}
+                                        <a href="{% url 'product:productdetails' product.id%}" class="latest-product__item">
+                                            <div class="latest-product__item__pic ">
+                                                <img src="/product/media/{{ product.image }}" alt="">
+                                            </div>
+                                            <div class="latest-product__item__text">
+                                                <h6>{{  product.name}}</h6>
+                                                <span class="price">{{ product.price}}</span>
+                                            </div>
+                                        </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="col-lg-9 col-md-7">
+                 
+                    <div class="filter__item">
+                        <div class="row">
+                             
+                            <div class="col-lg-4 col-md-4">
+                               
+                                <div  class="site-btn">
+                                     <strong> <span>{{ listProductByCate.count }}</span> Products found</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        {% for product in products %}
+                        <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="product__item">
+                                <div class="product__item__pic set-bg rounded-image" data-setbg="/product/media/{{ product.image }}"   >
+                                    {% if login %}
+                                    <ul class="product__item__pic__hover">
+                                        <li onclick="addToCart({{product.id}})"><a ><i class="fa fa-shopping-cart"></i></a></li>
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                                <div class="product__item__text">
+                                    
+                                    <h6><a href="{% url 'product:productdetails' product.id%}" >{{ product.name }}</a></h6>
+                                    
+                                    <h6 ><strong class="price" >{{ product.price }} </strong></h6>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="product__pagination">
+                       {% for i in pages %}
+                        <a href="{% url 'product:listproductbycate'%}?id={{ Category.id }}&page={{i}}"><p>{{ i }}</p></a>
+                        {% endfor %}
+                         
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Product Section End -->
+     <script>
+    function addToCart(product_id) {
+              $.ajax({
+                       url: '{% url 'cart:addtocart'%}',
+                        type: 'POST',
+                        data: JSON.stringify({id:product_id,quantity:1}),
+                        contentType: 'application/json',
+                        headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                        success: function (response) {
+                            if (response.status_add) {
+                                Swal.fire({
+                                    title: "Thêm sản phẩm vào giỏ hàng thành công",
+                                    text: "Bạn đã thêm sản phẩm vào giỏ hàng thành công",
+                                    icon: "success",
+                                });
+                            }
+                        }
+              });      
+        }
+    </script>
+{% endblock %}

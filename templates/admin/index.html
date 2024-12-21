@@ -1,0 +1,208 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block content %}
+    <div class="container-fluid py-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-line-chart fa-3x text-primary"></i>
+                            <div class="ms-3">
+                                <p class="mb-2">Monthly Revenue</p>
+                                <h6 id="monthlyRevenue" class="price-format"></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-archive fa-3x text-primary"></i>
+                            <div class="ms-3">
+                                <p class="mb-2">Monthly Orders</p>
+                                <h6 class="mb-0" id="monthlyOrders"></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-user fa-3x text-primary"></i>
+                            <div class="ms-3">
+                                <p class="mb-2">New users in the month</p>
+                                <h6 class="mb-0" id="newUsers"></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-cutlery fa-3x text-primary"></i>
+                            <div class="ms-3">
+                                <p class="mb-2">Monthly sales</p>
+                                <h6 class="mb-0" id="monthlySales"></h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header pb-0">
+                        <h6><strong>Monthly sales by category</strong></h6>
+                    </div>
+                    <div class="card-body">
+
+                        <canvas id="salesChartByCategory" style="width:100%;max-width:1000px"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header pb-0">
+                        <h6><strong>Monthly revenue</strong></h6>
+                    </div>
+                    <div class="card-body">
+
+                        <canvas id="revenueChart" style="width:100%;max-width:1000px"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    {# tinh tong #}
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "{% url 'dashboard:total' %}",
+                method: "GET",
+                success: function (data) {
+                    var revenue = data['revenue'].toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
+                    var orders = data['total_orders'];
+                    var users = data['new_users'];
+                    var sales = data['total_sales'];
+                    $('#monthlyRevenue ').html(revenue.toLocaleString());
+                    $('#monthlyOrders').html(orders + ' ' + 'orders');
+                    $('#newUsers').html(users + ' ' + 'users');
+                    $('#monthlySales').html(sales + ' ' + 'products');
+
+                }
+            });
+        });
+    </script>
+    {# bieu do doanh so theo danh muc san pham #}
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "{% url 'dashboard:saleschart'%}",
+                method: "GET",
+                success: function (data) {
+                    var ctx = document.getElementById('salesChartByCategory').getContext('2d');
+                    var salesChartByCategory = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: data.map(item => item['product__category__name']),
+                            datasets: [{
+                                label: 'Total Sold',
+                                data: data.map(item => item.total_sold),
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.6)',
+                                    'rgba(54, 162, 235, 0.6)',
+                                    'rgba(255, 206, 86, 0.6)',
+                                    'rgba(75, 192, 192, 0.6)',
+                                    'rgba(153, 102, 255, 0.6)',
+                                    'rgba(255, 159, 64, 0.6)',
+                                    'rgba(255, 99, 71, 0.6)',
+                                    'rgba(60, 179, 113, 0.6)',
+                                    'rgba(123, 104, 238, 0.6)',
+                                    'rgba(255, 140, 0, 0.6)',
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192,1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)',
+                                    'rgba(255, 99, 71, 1)',
+                                    'rgba(60, 179, 113, 1)',
+                                    'rgba(123, 104, 238, 1)',
+                                    'rgba(255, 140, 0, 1)',
+                                ],
+                                borderWidth: 1,
+                                barThickness: 40,
+                                maxBarThickness: 60,
+                                minBarLength: 2,
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    {# bieu do doanh thu trong thang #}
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "{% url 'dashboard:revenuechart'%}",
+                method: "GET",
+                success: function (data) {
+                    var ctx = document.getElementById('revenueChart').getContext('2d');
+                    var revenueChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.map(item => new Date(item['day']).toLocaleDateString()),
+                            datasets: [{
+                                label: 'Total Sold',
+                                data: data.map(item => item['total_revenue']),
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 2,
+                                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
+
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function (value, index, values) {
+                                            return value.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
+                                        }
+                                    }
+                                }
+                            },
+                            tooltips: {
+                                callbacks: {
+                                    label: function (tooltipItem, data) {
+                                        var value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                                        return value.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+{% endblock %}

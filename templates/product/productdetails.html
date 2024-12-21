@@ -1,0 +1,195 @@
+
+{% extends 'product/base.html' %}
+{% load static %}
+{% block content %}
+ <!-- Hero Section Begin -->
+    <section class="hero hero-normal">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="hero__categories">
+                        <div class="hero__categories__all">
+                            <i class="fa fa-bars"></i>
+                            <span>All categories</span>
+                        </div>
+                        <ul>
+                            {% for category in categories %}
+                            <li><a href="{% url 'product:listproductbycate' %}?id={{category.id}}">{{category.name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="hero__search">
+                        <div class="hero__search__form">
+                            <form action="{% url 'product:listproductbysearch' %}" method="get">
+                                <input name="keyword" type="text" placeholder="What do you need?">
+                                <button type="submit" class="site-btn">SEARCH</button>
+                            </form>
+                        </div>
+                        <div class="hero__search__phone">
+                            <div class="hero__search__phone__icon">
+                                <i class="fa fa-phone"></i>
+                            </div>
+                            <div class="hero__search__phone__text">
+                                <h5>098666888</h5>
+                                <span>Hỗ trợ  24/7 </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Hero Section End -->
+<!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{% static 'img/breadcrumb.jpg'%}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb__text">
+                        <h2>{{ productById.name }}</h2>
+                        <div class="breadcrumb__option">
+                            <a href="{% url 'product:listproduct' %}">Home</a>
+                            <a href="{% url 'product:listproductbycate' %}?id={{ categoryByProduct.id }}">{{ categoryByProduct.name }}</a>
+                            <span>{{ productById.name }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Product Details Section Begin -->
+    <section class="product-details spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="product__details__pic">
+                        <div class="product__details__pic__item">
+                            <img class="product__details__pic__item--large"
+                                src="/product/media/{{ productById.image }}" alt="">
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="product__details__text">
+                        <h3>{{ productById.name }}</h3>
+                        <div class="product__details__rating">
+
+                            <span>(Đã bán: {{ sold }})</span>
+                        </div>
+                        <div class="product__details__price price">{{ productById.afterDiscount }}</div>
+                        <p>{{ productById.details }}</p>
+                        <p>
+                            <span>Năng lượng: {{ productById.calories }}calo  </span>
+                            <span>Chất béo: {{ productById.fats }}g </span>
+                             <span>Chất xơ: {{ productById.carbs }}g </span>
+                             <span>Chất đạm: {{ productById.protein }}g  </span>
+                        </p>
+                    {% if login %}
+                        <div class="product__details__quantity">
+                            <div class="quantity">
+                                <div class="pro-qty">
+                                    <input type="text" value="1" id="quantity">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <a onclick="addToCart({{ productById.id }})" class="primary-btn">ADD TO CARD</a>
+                        {% endif %}
+                        <ul>
+                            <li><b>Trạng thái</b> <span>{% if productById.active %}Còn hàng {% endif %}</span></li>
+                            <li><b>Giao hàng</b> <span>Trong vòng vài tiếng.</span></li>
+                            <li><b>Chia sẻ ngay</b>
+                                <div class="share">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                    <a href="#"><i class="fa fa-pinterest"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="product__details__tab">
+                        
+                     
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Product Details Section End -->
+
+    <!-- Related Product Section Begin -->
+    <section class="related-product">
+    
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-2 col-md-5">
+                </div>
+                 <div class="col-lg-9 col-md-7">
+               <div class="product__discount">
+                        <div class="section-title product__discount__title">
+                            <h2>Sản phẩm liên quan</h2>
+                        </div>
+                        <div class="row">
+                            <div class="product__discount__slider owl-carousel">
+                                {% for repro in relatedProduct %}
+
+                                <div class="col-lg-4">
+                                    <div class="product__discount__item">
+                                        <div class="product__discount__item__pic set-bg rounded-image"
+                                            data-setbg="/product/media/{{ repro.image }}" >
+                                             {% if login %}
+                                    <ul class="product__item__pic__hover">
+                                        <li onclick="addToCart({{product.id}})"><a ><i class="fa fa-shopping-cart"></i></a></li>
+                                    </ul>
+                                    {% endif %}
+                                        </div>
+                                        <div class="product__discount__item__text ">
+                                            <h5><a href="{% url 'product:productdetails' repro.id %}">{{ repro.name}}</a></h5>
+
+                                            <div class="product__item__price ">
+
+                                                <div class="price">{{repro.price}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                               {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </div>
+    </section>
+    <!-- Related Product Section End -->
+<script>
+function addToCart(product_id) {    
+                var quantity = $('#quantity').val();
+              $.ajax({
+                       url: '{% url 'cart:addtocart'%}',
+                        type: 'POST',
+                        data: JSON.stringify({id:product_id,quantity:quantity}),
+                        contentType: 'application/json',
+                        headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                        success: function (response) {
+                            if (response.status_add) {
+                                Swal.fire({
+                                    title: "Thêm sản phẩm vào giỏ hàng thành công",
+                                    text: "Bạn đã thêm sản phẩm vào giỏ hàng thành công",
+                                    icon: "success",
+                                });
+                            }
+                        }
+              });      
+        }
+</script>
+
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends 'cart/base.html' %}
+{% load static %}
+{% block content %}
+    <!-- Hero Section Begin -->
+    <section class="hero hero-normal">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="hero__categories">
+                        <div class="hero__categories__all">
+                            <i class="fa fa-bars"></i>
+                            <span>All categories</span>
+                        </div>
+                        <ul>
+                            {% for category in categories %}
+                            <li><a href="{% url 'product:listproductbycate' %}?id={{category.id}}">{{category.name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="hero__search">
+                        <div class="hero__search__form">
+                            <form action="{% url 'product:listproductbysearch' %}" method="get">
+                                <input name="keyword" type="text" placeholder="What do you need?">
+                                <button type="submit" class="site-btn">SEARCH</button>
+                            </form>
+                        </div>
+                        <div class="hero__search__phone">
+                            <div class="hero__search__phone__icon">
+                                <i class="fa fa-phone"></i>
+                            </div>
+                            <div class="hero__search__phone__text">
+                                <h5>+65 11.188.888</h5>
+                                <span>support 24/7 time</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Hero Section End -->
+
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{% static 'img/breadcrumb.jpg' %}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb__text">
+                        <h2>Organi Shop</h2>
+                        <div class="breadcrumb__option">
+                            <a href="./index.html">Home</a>
+                            <span>Order</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+<!-- Checkout Section Begin -->
+    <section class="checkout spad">
+        <div class="container">
+            <div class="row">
+               
+            </div>
+            <div class="checkout__form">
+                <h4>Chi tiết đơn hàng</h4>
+                <form >
+                    <div class="row">
+                        <div class="col-lg-8 col-md-6">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="checkout__input">
+                                        <p>Họ và tên<span>*</span></p>
+                                        <input type="text" id="name" required="required">
+                                    </div>
+                                </div>
+                               
+                            </div>
+                            <div class="checkout__input" >
+                                <p>Tỉnh/Thành phố<span>*</span></p>
+                                <input type="text" id="province" required="required">
+                            </div>
+                             <div class="checkout__input">
+                                <p>Quận/Huyện<span>*</span></p>
+                                <input type="text" id="district" required="required">
+                            </div>
+                            <div class="checkout__input">
+                                <p>Phường/Xã<span>*</span></p>
+                                <input type="text" id="ward" required="required">
+                            </div>
+                            <div class="checkout__input">
+                                <p>Địa chỉ cụ thể<span>*</span></p>
+                                <input type="text" placeholder="Tên đường" class="checkout__input__add" id="street">
+                                <input type="text" placeholder="Số nhà" id="home" required="required">
+                            </div>
+                           
+                           
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="checkout__input">
+                                        <p>Số điện thoại<span>*</span></p>
+                                        <input type="text" id="phone" required="required">
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                           
+                           
+                            <div class="checkout__input">
+                                <p>Ghi chú<span>*</span></p>
+                                <input type="text"
+                                    placeholder="Ghi chú cho đơn hàng của bạn" id="note" >
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="checkout__order">
+                                <h4>Đơn hàng của bạn</h4>
+                                <div class="checkout__order__products">Sản phẩm <span>Thành tiền</span></div>
+                                <ul>
+                                    {% for cdt in cdts %}
+                                    <li>{{ cdt.product.name}} | SL: {{ cdt.quantity }}<span class="price">{{ cdt.total }}</span></li>
+                                    {% endfor %}
+                                    
+                                </ul>
+                                <div class="checkout__order__total">Thành tiền <span class="price">{{ customer_cart.total }}</span></div>
+                               
+                               
+                                <button class="site-btn" id="btn-order" >PLACE ORDER</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <!-- Checkout Section End -->
+  
+<script>
+        $(document).ready(function () {
+            
+       $('#btn-order').on('click', function(event) {
+                event.preventDefault();
+                let name = $('#name').val();
+                let province = $('#province').val();
+                let district=$('#district').val();
+                let ward=$('#ward').val();
+                let street=$('#street').val();
+                let home=$('#home').val();
+                let phone=$('#phone').val();
+                let note=$('#note').val()
+                let address=province+" , "+district+" , "+ward+" , "+street+" , "+home;
+                    $.ajax({
+                        url: '{% url 'order:placeorder' %}',
+                        type: 'POST',
+                        data: JSON.stringify({name:name,address:address,phone:phone,note:note}),
+                        headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                        contentType: 'application/json',
+                        success: function (response) {
+                            if (response.status_order) {
+                               Swal.fire({ title: 'Đặt hàng thành công!', 
+                                   text: 'Chúc mừng bạn đã đặt hàng thành công.',
+                                   icon: 'success'
+                               }).then((result) => { if (result.isConfirmed) { 
+                                   window.location.href = '/'; } });
+                               
+                            }
+                        }
+                    });
+                 });
+                      
+        });
+        
+    </script>
+    
+{% endblock %}

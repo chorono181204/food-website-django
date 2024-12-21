@@ -1,0 +1,5 @@
+{% autoescape off %}
+Chào {{ user.name }},
+Vui lòng nhấp vào liên kết dưới đây để xác thực tài khoản của bạn và không chia sẻ cho bất cứ ai:
+http://{{ domain }}{% url 'user:active' uidb64=uid token=token %}
+{% endautoescape %}

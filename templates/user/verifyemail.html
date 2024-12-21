@@ -1,0 +1,39 @@
+{% extends 'user/base.html' %}
+{% block content %}
+     <div class="rounded-box">
+        <h2>Xác thực tài khoản</h2>
+        <p>Vui lòng kiểm tra hòm thư của bạn</p>
+         <a href="{% url 'user:login' %}">
+        <button class="btn-verify" type="submit" >Đăng nhập</button>
+         </a>
+    </div>
+    {% if verifysuccess %}
+        <script>
+        Swal.fire({
+        title: "Xác thực thành công ",
+        text: "Chúc mừng bạn đã xác thực tài khoản thành công.Hãy bắt đầu đăng nhập",
+        icon: "success",
+        footer: '<a href="{% url 'user:login' %}">Đăng nhập tài khoản</a>'
+        });
+        </script>
+    {% endif %}
+    {% if verified %}
+        <script>
+        Swal.fire({
+        title: "Tài khoản này đã được xác thực",
+        text: "Tài khoản của bạn đã được xác thực trước đó",
+        icon: "warning",
+        footer: '<a href="{% url 'user:login' %}">Đăng nhập tài khoản</a>'
+        });
+        </script>
+    {% endif %}
+    {% if verifyfail %}
+        <script>
+        Swal.fire({
+        title: "Xác thực không thành công",
+        text: "Vui lòng kiểm tra lại đường liên kết",
+        icon: "error",
+        });
+        </script>
+    {% endif %}
+{% endblock %}

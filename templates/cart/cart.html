@@ -1,0 +1,225 @@
+{% extends 'cart/base.html' %}
+{% load static %}
+{% block content %}
+    <!-- Hero Section Begin -->
+    <section class="hero hero-normal">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="hero__categories">
+                        <div class="hero__categories__all">
+                            <i class="fa fa-bars"></i>
+                            <span>All categories</span>
+                        </div>
+                        <ul>
+                            {% for category in categories %}
+                            <li><a href="{% url 'product:listproductbycate' %}?id={{category.id}}">{{category.name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="hero__search">
+                        <div class="hero__search__form">
+                            <form action="{% url 'product:listproductbysearch' %}" method="get">
+                                <input name="keyword" type="text" placeholder="What do you need?">
+                                <button type="submit" class="site-btn">SEARCH</button>
+                            </form>
+                        </div>
+                        <div class="hero__search__phone">
+                            <div class="hero__search__phone__icon">
+                                <i class="fa fa-phone"></i>
+                            </div>
+                            <div class="hero__search__phone__text">
+                                <h5>+65 11.188.888</h5>
+                                <span>support 24/7 time</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Hero Section End -->
+
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{% static 'img/breadcrumb.jpg' %}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb__text">
+                        <h2>Organi Shop</h2>
+                        <div class="breadcrumb__option">
+                            <a href="./index.html">Home</a>
+                            <span>Cart</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Shopping Cart Section Begin -->
+    <section class="shoping-cart spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">`
+                    <div class="shoping__cart__table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="shoping__product">Sản phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Thành tiền</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-items">
+                                {% for cdt in cdts %}
+                                <tr class="cart-item" id="product-{{ cdt.id }}" data-price="{{ cdt.product.afterDiscount }}">
+                                    <td class="shoping__cart__item">
+                                        <img class="img-cart" src="/product/media/{{ cdt.product.image }}" alt="">
+                                        <h5>{{ cdt.product.name }}</h5>
+                                    </td>
+                                    <td class="shoping__cart__price">
+                                        <span class="price">{{ cdt.product.afterDiscount }}</span>
+                                    </td>
+                                    <td class="shoping__cart__quantity">
+                                        <div class="quantity">
+                                            <div class="pro-qty">
+                                                <input type="number" class="quantity-product" value="{{ cdt.quantity }}" min="1">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="shoping__cart__total">
+                                        <span class="total "></span>
+                                    </td>
+                                    <td class="shoping__cart__item__close" >
+                                          <span onclick="deleteCartItem({{ cdt.id }})" class="icon_close"></span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="shoping__cart__btns">
+                        <a href="{% url 'product:listproduct' %}" class="primary-btn cart-btn">Tiếp tục mua sắm </a>
+                        <a id="updateCartButton" class="primary-btn cart-btn cart-btn-right"><span class="icon_loading"></span> Cập nhật</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="shoping__continue">
+                        
+                    </div>
+                </div>
+                {% if cdts %}
+                <div class="col-lg-6">
+                    <div class="shoping__checkout">
+                        <h5>Cart Total</h5>
+                        <ul>
+                            <li>Subtotal <span id="subtotal"> </span></li>
+                            <li>Total <span id="cart-total"></span></li>
+                        </ul>
+                        <a href="{% url 'order:order' %}" class="primary-btn">Đặt hàng</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    <!-- Shopping Cart Section End -->
+
+    <script>
+        function updateProductTotal(productId) {
+            var product = $('#' + productId);
+            var price = parseInt(product.data('price'));
+            var quantity = parseInt(product.find('.quantity-product').val());
+            var total = price * quantity;
+            product.find('.total').text(total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+            return total;
+        }
+
+        function updateCartTotal() {
+            var cartTotal = 0;
+            $('#cart-items .cart-item').each(function() {
+                var productId = $(this).attr('id');
+                var productTotal = updateProductTotal(productId);
+                cartTotal += productTotal;
+            });
+            $('#subtotal').text(cartTotal.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+            $('#cart-total').text(cartTotal.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+        }
+
+        // Cập nhật tổng tiền cho tất cả sản phẩm và giỏ hàng khi trang được tải
+        updateCartTotal();
+
+        // Thêm sự kiện khi số lượng thay đổi
+        $('#cart-items').on('click', '.pro-qty', function() {
+            updateCartTotal();
+        });
+    </script>
+{#    gui api update#}
+    <script>
+$(document).ready(function() {
+    $('#updateCartButton').on('click', function() {
+        let ids=[]
+        let quantities=[]
+        $('.cart-item').each(function() {
+            let itemId = $(this).attr('id').split('-')[1];
+            let quantity = $(this).find('.quantity-product').val();
+            ids.push(itemId);
+            quantities.push(quantity);
+        });
+        $.ajax({
+                       url: '{% url 'cart:updatecart'%}',
+                        type: 'PUT',
+                        data: JSON.stringify({ids:ids,quantities:quantities}),
+                        contentType: 'application/json',
+                        headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                        success: function (response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    title: "Cập nhật giỏ hàng thành công",
+                                    text: "Bạn đã cập nhật giỏ hàng thành công",
+                                    icon: "success",
+                                });
+                                updateCartTotal();
+
+                            }
+                        }
+                    });
+    });
+
+
+});
+</script>
+    {# xoa sp #}
+    <script>
+    function deleteCartItem(cart_item_id) {
+              $.ajax({
+                       url: '{% url 'cart:deletecart'%}',
+                        type: 'DELETE',
+                        data: JSON.stringify({id:cart_item_id}),
+                        contentType: 'application/json',
+                        headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                        success: function (response) {
+                            if (response.status_delete) {
+                                Swal.fire({
+                                    title: "Xoá sản phẩm thành công",
+                                    text: "Bạn đã xoá sản phẩm thành công",
+                                    icon: "success",
+                                });
+                                document.getElementById(`product-${cart_item_id}`).remove();
+                                updateCartTotal();
+                            }
+                        }
+                    });      
+        }
+    </script>
+{% endblock %}

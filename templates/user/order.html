@@ -1,0 +1,76 @@
+{% extends 'user/basedashboard.html' %}
+{% block content %}
+    <div class="cus-container">
+   <div class="cus-sidebar">
+
+    <h2>
+    <strong>{{ customer.name }}</strong> 
+    </h2>
+    <h3>
+        <strong>Tài khoản của tôi</strong>
+    </h3>
+    <ul>
+     <li>
+      <a  href="{% url 'user:customerdashboard' %}">
+       <i class="fas fa-user">
+       </i>
+       Thông tin cá nhân
+      </a>
+     </li>
+     <li>
+      <a class="active" href="{% url 'user:customerorder' %}">
+       <i class="fas fa-box">
+       </i>
+       Đơn hàng
+      </a>
+     </li>
+    </ul>
+    <h3>
+     Quà tặng
+    </h3>
+   
+    <a class="logout" href="{% url 'user:logout' %}">
+     Đăng xuất
+    </a>
+   </div>
+   <div class="cus-content">
+       <table>
+        <thead>
+            <tr>
+                <th>Mã đơn hàng</th>
+                <th>Tiền</th>
+                <th>Ngày đặt hàng</th>
+                <th>Trạng thái</th>
+                <th>Chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for order in order_list %}
+            <tr>
+                <td class="order-code">{{ order.code }}</td>
+                <td class="price">{{ order.total }}</td>
+                <td>{{ order.date }}</td>
+                
+                <td class="status">{{ order.get_status_display}}</td>
+                <td class="icons" >
+                    <i class="fas fa-box" onclick="orderDetails({{ order.id }})"></i>
+                </td>
+            </tr>
+        {% endfor %}
+          
+        </tbody>
+    </table>
+   </div>
+  </div>
+    {# ----------------------------------------------------------------------------------------------------------- #}
+    
+    
+    
+    
+    <script>
+   function orderDetails(order_id) {
+    window.location.href = `/orderdetails/${order_id}`;
+}
+
+    </script>
+{% endblock %}

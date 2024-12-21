@@ -1,0 +1,132 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+<div class="form-structor">
+        <div class="signup">
+            <h2 class="form-title" id="signup"><span>or</span>Đăng kí</h2>
+
+            <form id="signupForm">
+                <div class="form-holder">
+                    <input name="name" id="name" type="text" class="input" placeholder="Tên" required="required" />
+                    <input name="email" id="email" type="email" class="input" placeholder="Email" required="required" />
+                    <input name="password" id="password" type="password" class="input" placeholder="Mật khẩu"
+                        required="required" />
+                    <input name="confirmpassword" id="confirmpassword" type="password" class="input"
+                        placeholder="Nhập lại mật khẩu" required="required" />
+                </div>
+
+                <button class="submit-btn" type="submit" id="btnSignup">Đăng kí</button>
+            </form>
+        </div>
+        <div class="login slide-up">
+            <div class="center">
+                <h2 class="form-title" id="login"><span>hoặc</span>Đăng nhập</h2>
+                <form action="{% url 'user:login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-holder">
+                        <input type="email" class="input" name="email" placeholder="Tài khoản" required="required"
+                            value="{{ email }}" />
+                        <input type="password" class="input" name="password" placeholder="Mật khẩu" required="required"
+                            value="{{ password }}" />
+
+                    </div>
+                    <button class="submit-btn" type="submit">Đăng nhập</button>
+                </form>
+                <div class="forgot-password">
+                    <a href="{% url 'user:forgotpassword' %}"><span>Quên mật khẩu?</span></a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    
+ <script>
+        $(document).ready(function () {
+            $('#signupForm').on('submit', function (event) {
+                event.preventDefault();
+                validateForm();
+            }); 
+
+            function validateForm() {
+                let name = $('#name').val();
+                let email = $('#email').val();
+                let password = $('#password').val();
+                let confirmpassword = $('#confirmpassword').val();
+                let isValid = true;
+                let message = '';
+                if(email!==''){
+                    $.ajax({
+                       url: '{% url 'user:checkemail' %}',
+                        type: 'POST',
+                        data: JSON.stringify({email: email }),
+                        contentType: 'application/json',
+                        headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                        success: function (response) {
+                            if (response.exists) {
+                                isValid = false;
+                                Swal.fire({
+                                    title: "Email đã tồn tại ",
+                                    text: "Vui lòng kiểm tra lại",
+                                    icon: "error",
+                                    footer: '<a href="#">Lấy lại mật khẩu</a>'
+                                });
+                                return;
+                            }
+                        }
+                    });
+                }
+                 if (password === '' || password.length < 8) {
+                    isValid = false;
+                    Swal.fire({
+                        title: "Mật khẩu phải dài hơn 8 kí tự",
+                        text: "Vui lòng tăng cường bảo mật",
+                        icon: "warning"
+                    });
+                    return;
+                }else
+                  if (password !== confirmpassword) {
+                    isValid = false;
+                    Swal.fire({
+                        title: "Mật khẩu không trùng khớp",
+                        text: "Vui lòng kiểm tra lại",
+                        icon: "error"
+                    });
+                    return;
+
+                }
+
+                if (isValid) {
+                    $.ajax({
+                        url: '{% url 'user:signup' %}',
+                        type: 'POST',
+                        data: JSON.stringify({email: email,password:password,name:name }),
+                        headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                        contentType: 'application/json',
+                        success: function (response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    title: "Đăng kí thành công ",
+                                    text: "Chúc mừng bạn đã đăng kí thành công.Chỉ còn bước xác thực tài khoản để đảm bảo quyền lợi một cách tốt nhất",
+                                    icon: "success",
+                                    footer: `<a href="{% url 'user:verify'%}?id=${response.id}">Kích hoạt tài khoản</a>`
+                                });
+                                return;
+                            }
+                        }
+                    });
+                } else {
+                   Swal.fire({
+                                    title: "Đăng kí thất bại",
+                                    text: "Vui lòng quay lại sau ít phút",
+                                    icon: "error",
+                                });
+                   return;
+                }
+            }           
+        });
+
+
+    </script>
+    
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'user/basedashboard.html' %}
+{% block content %}
+    <div class="cus-container">
+   <div class="cus-sidebar">
+    
+    <h2>
+    <strong>{{ customer.name }}</strong> 
+    </h2>
+    <h3>
+        <strong>Tài khoản của tôi</strong>
+    </h3>
+    <ul>
+     <li>
+      <a class="active" href="{% url 'user:customerdashboard' %}">
+       <i class="fas fa-user">
+       </i>
+       Thông tin cá nhân
+      </a>
+     </li>
+     <li>
+      <a href="{% url 'user:customerorder' %}">
+       <i class="fas fa-box">
+       </i>
+       Đơn hàng
+      </a>
+     </li>
+    </ul>
+    <ul>
+     <li>
+     </li>
+    </ul>
+    <a class="logout" href="{% url 'user:logout' %}">
+     Đăng xuất
+    </a>
+   </div>
+   <div class="cus-content">
+    <h2>
+        <strong>
+     Thông tin cá nhân
+        </strong>
+    </h2>
+    <div class="info">
+     <div>
+      <span>
+       Tên
+      </span>
+      <strong>
+       {{ customer.name }}
+      </strong>
+         
+     </div>
+    </div>
+    <div class="info">
+     <div>
+      <span>
+       Email
+      </span>
+      <strong>
+       {{ customer.email }}
+      </strong>
+     </div>
+    </div>
+    <div class="info">
+     <div>
+      
+     </div>
+    </div>
+    <div class="info">
+     <div>
+      <span>
+       Mã khách hàng
+      </span>
+      <strong>
+        {{ customer.customer_code }}
+      </strong>
+     </div>
+    </div>
+       <div class="info">
+     <div>
+      <span>
+       Số lượng đơn hàng đã đặt
+      </span>
+      <strong>
+        {{ order_total }}
+      </strong>
+     </div>
+    </div>
+    <div class="buttons" >
+     <button onclick="changePassword()" >
+      Thay đổi mật khẩu
+     </button>
+    </div>
+   </div>
+  </div>
+    <script>
+    function changePassword() {
+    window.location.href = `/customer/changepassword`;
+}
+    </script>
+{% endblock %}
